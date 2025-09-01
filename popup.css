@@ -72,10 +72,9 @@ h3 {
 .icon {
     width: 20px;
     height: 20px;
-    display: none; /* Hide all icons by default */
+    display: none;
 }
 
-/* State-specific icon visibility */
 #downloadBtn:not(.working):not(.success):not(.error) #iconDownload { display: block; }
 #downloadBtn.working #iconSpinner { display: block; }
 #downloadBtn.success #iconSuccess { display: block; }

@@ -1,10 +1,5 @@
 // This file is injected and run in the page's MAIN world.
 
-/**
- * Sends a status update message to the extension's content script.
- * @param {string} message - The text to display.
- * @param {number|null} progress - The progress percentage (0-100), or -1 for error.
- */
 function updateStatus(message, progress = null) {
     window.postMessage({ type: "HOTAUDIO_DOWNLOAD_STATUS", message: message, progress: progress }, "*");
 }

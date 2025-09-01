@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusEl.textContent = state.message;
 
         // Check for and display the duration warning
-        if (state.duration > 600) { // 600 seconds = 10 minutes
+        if (state.duration && state.duration > 600) { // 600 seconds = 10 minutes
             const minutes = Math.floor(state.duration / 60);
             warningEl.textContent = `Warning: This is a long audio file (~${minutes} minutes). The capture process may take some time.`;
             warningEl.style.display = 'block';
@@ -71,28 +71,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // When popup opens, immediately ask the background script for the current state
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (tabs[0] && tabs[0].id) {
-            chrome.runtime.sendMessage({ action: "getTabState", tabId: tabs[0].id }, (response) => {
-                if(chrome.runtime.lastError) {
-                    console.warn("Could not get tab state:", chrome.runtime.lastError.message);
-                    updateUI(null); // Reset to default state
-                } else {
-                    updateUI(response);
-                }
-            });
-        }
-    });
+    function fetchAndUpdateState() {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0] && tabs[0].id) {
+                chrome.runtime.sendMessage({ action: "getTabState", tabId: tabs[0].id }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.warn("Could not get tab state:", chrome.runtime.lastError.message);
+                        updateUI(null); // Reset to default state
+                    } else {
+                        updateUI(response);
+                    }
+                });
+            }
+        });
+    }
 
-    // Listen for real-time updates pushed from the content script
+    // When popup opens, immediately ask the background script for the current state
+    fetchAndUpdateState();
+
+    // Listen for real-time updates from the background/content script
     chrome.runtime.onMessage.addListener((request, sender) => {
-        // Only update if the message is from our active tab's content script
+        // A message indicates that the state *might* have changed.
+        // Instead of using the partial data in `request`, we ask the background
+        // script (the single source of truth) for the complete, up-to-date state.
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs[0] && sender.tab && sender.tab.id === tabs[0].id) {
-                if(request.action === "updateStatus") {
-                    updateUI(request);
-                }
+                fetchAndUpdateState();
             }
         });
     });
