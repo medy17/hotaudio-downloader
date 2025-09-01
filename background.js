@@ -28,7 +28,11 @@ chrome.runtime.onInstalled.addListener(() => {
 // --- ICON AND STATE MANAGEMENT LOGIC ---
 
 const tabStates = {}; // Our persistent store for download states
-let iconBitmap = null; // Cache for the base icon image
+
+// --- MODIFIED: We now cache two separate images ---
+let iconBaseBitmap = null;    // Cache for the default icon (dimmed background)
+let iconProgressBitmap = null; // Cache for your custom progress icon (the reveal)
+
 
 /**
  * Resets the toolbar icon for a specific tab to the default.
@@ -48,19 +52,19 @@ function resetIcon(tabId) {
 }
 
 /**
- * Draws a progress ring on the extension icon.
+ * Draws a pie chart reveal effect using the custom progress icon.
  * @param {number} tabId The ID of the tab to update.
  * @param {number} progress The progress percentage (0-100).
  */
 async function updateIconProgress(tabId, progress) {
-    // Load the base icon image only once and cache it
-    if (!iconBitmap) {
+    // We only need to load and cache the custom progress icon for this function.
+    if (!iconProgressBitmap) {
         try {
-            const response = await fetch(chrome.runtime.getURL('icons/icon128.png'));
+            const response = await fetch(chrome.runtime.getURL('icons/icon_progress.png'));
             const blob = await response.blob();
-            iconBitmap = await createImageBitmap(blob);
+            iconProgressBitmap = await createImageBitmap(blob);
         } catch (e) {
-            console.error("Could not load base icon:", e);
+            console.error("Could not load custom progress icon:", e);
             return;
         }
     }
@@ -68,66 +72,64 @@ async function updateIconProgress(tabId, progress) {
     const canvas = new OffscreenCanvas(128, 128);
     const ctx = canvas.getContext('2d');
 
-    // Clear canvas and draw the base icon
+    // Clear canvas
     ctx.clearRect(0, 0, 128, 128);
-    ctx.drawImage(iconBitmap, 0, 0, 128, 128);
 
-    // Styling for the progress ring
-    const center = 64;
-    const radius = 58;
-    ctx.lineWidth = 25;
-
-    // Draw the background ring (dark grey)
-    ctx.strokeStyle = '#3a3f4b';
-    ctx.beginPath();
-    ctx.arc(center, center, radius, 0, 2 * Math.PI);
-    ctx.stroke();
+    // 1. Draw the custom icon, dimmed, as the full background.
+    ctx.globalAlpha = 0.4;
+    ctx.drawImage(iconProgressBitmap, 0, 0, 128, 128);
+    ctx.globalAlpha = 1.0; // Reset alpha
 
     if (progress > 0) {
-        // Draw the progress arc (orange)
-        ctx.strokeStyle = '#ed662e';
-        ctx.beginPath();
-        const startAngle = -Math.PI / 2; // Start from the top
+        // 2. Create the "pie slice" clipping path.
+        const center = 64;
+        const radius = 64;
+        const startAngle = -Math.PI / 2;
         const endAngle = startAngle + (progress / 100) * 2 * Math.PI;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(center, center);
         ctx.arc(center, center, radius, startAngle, endAngle);
-        ctx.stroke();
+        ctx.closePath();
+        ctx.clip();
+
+        // 3. Draw the full-color custom icon again, but only inside the clipped area.
+        ctx.drawImage(iconProgressBitmap, 0, 0, 128, 128);
+
+        ctx.restore();
     }
 
-    // Set the canvas as the new icon
+    // 4. Set the generated canvas as the new icon for the tab.
     const imageData = ctx.getImageData(0, 0, 128, 128);
     chrome.action.setIcon({ tabId: tabId, imageData: imageData });
 }
 
-// Listen for messages from content scripts or popup
+// --- The message listener remains the same ---
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const tabId = request.tabId || (sender.tab ? sender.tab.id : null);
     if (!tabId) return true;
 
     if (request.action === "updateStatus") {
-        // Merge new state with any existing state (like duration)
         tabStates[tabId] = { ...tabStates[tabId], ...request };
 
         if (request.progress !== null && request.progress >= 0) {
             updateIconProgress(tabId, request.progress);
         }
 
-        // If the download is complete or failed, clear the state and reset icon after a delay
         if (request.progress === 100 || request.message.includes("Error")) {
             setTimeout(() => {
                 delete tabStates[tabId];
                 resetIcon(tabId);
-            }, 5000); // Keep state for 5 seconds for user to see
+            }, 5000);
         }
 
     } else if (request.action === "durationInfo") {
-        // Store the duration when we receive it
         tabStates[tabId] = { ...tabStates[tabId], duration: request.duration };
 
     } else if (request.action === "getTabState") {
-        // The popup is asking for the current state for its tab
         sendResponse(tabStates[tabId]);
     }
 
-    // Keep the message channel open for asynchronous responses
     return true;
 });

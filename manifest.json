@@ -30,7 +30,10 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["modified_nozzle.js"],
+      "resources": [
+        "modified_nozzle.js",
+        "icons/icon_progress.png"
+      ],
       "matches": ["*://*.hotaudio.net/*"]
     }
   ],
