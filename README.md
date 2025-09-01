@@ -11,7 +11,7 @@ Hotaudio.net uses modern streaming technologies (like MPEG-DASH) where audio is 
 
 Since this extension is not on the Chrome Web Store, it must be loaded manually in Developer Mode.
 
-1.  **Download the Files**: Place all the provided files (`manifest.json`, `popup.html`, `popup.css`, `popup.js`, etc.) into a single, dedicated folder on your computer (e.g., `hotaudio-downloader`).
+1.  **Download the Extension**: Click on the green code button, download az zip, unzip into a folder of the same name (e.g., `hotaudio-downloader`).
 2.  **Open Chrome Extensions**: Open Google Chrome, navigate to the extensions page by typing `chrome://extensions` into the address bar and pressing Enter.
 3.  **Enable Developer Mode**: In the top-right corner of the Extensions page, toggle the "Developer mode" switch to the ON position.
 4.  **Load Unpacked**: You will now see three new buttons. Click on the **"Load unpacked"** button.
