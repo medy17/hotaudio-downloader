@@ -3,7 +3,7 @@
 /**
  * Sends a status update message to the extension's content script.
  * @param {string} message - The text to display.
- * @param {number|null} progress - The progress percentage (0-100), or null if not applicable.
+ * @param {number|null} progress - The progress percentage (0-100), or -1 for error.
  */
 function updateStatus(message, progress = null) {
     window.postMessage({ type: "HOTAUDIO_DOWNLOAD_STATUS", message: message, progress: progress }, "*");
@@ -21,10 +21,27 @@ function automate() {
     }
 
     const audioElement = audioSource.el;
-    let downloadTriggered = false; // Flag to ensure download happens only once
-    let progressInterval = null;   // To hold our progress updater interval
-    let stallTimerId = null;       // To hold our stall detector timer
-    let lastKnownChunkCount = 0;   // To track if new chunks have arrived
+    let downloadTriggered = false;
+    let progressInterval = null;
+    let stallTimerId = null;
+    let lastKnownChunkCount = 0;
+
+    /**
+     * Sends the audio duration to the extension as soon as it's available.
+     */
+    const sendDurationInfo = () => {
+        const checkDuration = () => {
+            if (audioElement.duration && isFinite(audioElement.duration)) {
+                window.postMessage({ type: "HOTAUDIO_DURATION_INFO", duration: audioElement.duration }, "*");
+            }
+        };
+        if (audioElement.readyState > 0) {
+            checkDuration();
+        } else {
+            audioElement.addEventListener('loadedmetadata', checkDuration, { once: true });
+        }
+    };
+    sendDurationInfo();
 
     /**
      * Starts an interval that periodically sends progress updates.
@@ -42,7 +59,7 @@ function automate() {
      * Finalizes the process, stitching chunks and initiating the download.
      */
     const triggerDownload = () => {
-        if (downloadTriggered) return; // Prevent multiple triggers
+        if (downloadTriggered) return;
         downloadTriggered = true;
 
         // Clean up all timers and listeners
@@ -81,12 +98,10 @@ function automate() {
 
     /**
      * A watchdog function that monitors playback near the end of the track.
-     * If playback stops receiving new data, it forces the download to start.
      */
     const stallWatcher = () => {
         if (downloadTriggered) return;
 
-        // Check if new chunks have been added since last time. If so, reset any pending stall timer.
         const currentChunkCount = window.DECRYPTED_AUDIO_CHUNKS ? window.DECRYPTED_AUDIO_CHUNKS.length : 0;
         if (currentChunkCount > lastKnownChunkCount) {
             lastKnownChunkCount = currentChunkCount;
@@ -98,24 +113,18 @@ function automate() {
 
         const timeRemaining = audioElement.duration - audioElement.currentTime;
 
-        // Condition to START the watchdog timer:
-        // 1. We are within the last 5 seconds of the track.
-        // 2. The player is actively playing (not paused).
-        // 3. A stall timer isn't already running.
         if (audioElement.duration > 0 && timeRemaining <= 5 && !audioElement.paused && !stallTimerId) {
-            // If we don't get a new chunk or a reset in the next 2.5 seconds, assume it's finished.
             stallTimerId = setTimeout(() => {
-                console.log('Playback stalled in the last 5 seconds. Assuming end of track and triggering download.');
+                console.log('Playback stalled. Assuming end of track and triggering download.');
                 updateStatus('Playback finished (stall detected).', 100);
                 triggerDownload();
             }, 2500);
         }
     };
 
-    // Attach the stall watcher to the timeupdate event.
     audioElement.addEventListener('timeupdate', stallWatcher);
 
-    // If the track is already effectively finished when we start, download immediately.
+    // If the track is already effectively finished, download immediately.
     if (audioElement.duration > 0 && audioElement.currentTime >= audioElement.duration - 0.5) {
         console.log("Track already finished. Triggering download now.");
         updateStatus("Audio already played, downloading...", 100);
@@ -123,7 +132,7 @@ function automate() {
         return;
     }
 
-    // The 'ended' event is the primary, clean trigger for the download.
+    // The 'ended' event is the primary trigger.
     audioElement.addEventListener('ended', () => {
         console.log('Official "ended" event fired. Triggering download.');
         updateStatus('Playback finished.', 100);
@@ -131,7 +140,7 @@ function automate() {
     }, { once: true });
 
     // Start the high-speed data capture process.
-    updateStatus("Capturing audio data (this is fast)...", 0);
+    updateStatus("Capturing audio data...", 0);
     startProgressUpdater();
     console.log("Speeding up and playing audio to capture all chunks...");
     audioElement.currentTime = 0;
@@ -143,7 +152,7 @@ function automate() {
     });
 }
 
-// Poll for the 'as' object before starting the entire automation process.
+// Poll for the 'as' object before starting everything.
 let attempts = 0;
 const intervalId = setInterval(() => {
     if (window.as) {

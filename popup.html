@@ -2,25 +2,34 @@
 <html>
 <head>
     <title>Hotaudio Downloader</title>
-    <style>
-        body { font-family: sans-serif; width: 250px; text-align: center; padding: 10px; }
-        button {
-            padding: 10px 20px; font-size: 16px; cursor: pointer;
-            border: 1px solid #ccc; border-radius: 5px; background-color: #f0f0f0;
-        }
-        button:hover { background-color: #e0e0e0; }
-        button:disabled { cursor: not-allowed; background-color: #fafafa; color: #999; }
-        #status { margin-top: 10px; min-height: 20px; font-style: italic; color: #555; }
-        progress { width: 90%; margin-top: 10px; } /* New Progress Bar Style */
-    </style>
+    <link rel="stylesheet" href="popup.css">
 </head>
 <body>
 <h3>Hotaudio Downloader</h3>
-<button id="downloadBtn">Download Audio</button>
+<div id="warning" style="display: none;"></div>
+
+<button id="downloadBtn">
+    <!-- Download Icon -->
+    <svg id="iconDownload" class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+
+    <!-- Spinner Icon -->
+    <svg id="iconSpinner" class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path opacity="0.2" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="currentColor"/><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM12 20V22M12 2V4M20 12H22M2 12H4M19.0711 4.92893L20.4853 3.51472M3.51472 20.4853L4.92893 19.0711M19.0711 19.0711L20.4853 20.4853M3.51472 3.51472L4.92893 4.92893" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+    <!-- Success Icon -->
+    <svg id="iconSuccess" class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+    <!-- Error Icon -->
+    <svg id="iconError" class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+    <span id="btnText">Download Audio</span>
+</button>
+
 <div id="progressContainer" style="display: none;">
     <progress id="progressBar" value="0" max="100"></progress>
 </div>
+
 <p id="status">Ready to download.</p>
+
 <script src="popup.js"></script>
 </body>
 </html>
