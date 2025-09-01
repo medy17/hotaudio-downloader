@@ -1,5 +1,3 @@
-// This file is injected and run in the page's MAIN world.
-
 function updateStatus(message, progress = null) {
     window.postMessage({ type: "HOTAUDIO_DOWNLOAD_STATUS", message: message, progress: progress }, "*");
 }

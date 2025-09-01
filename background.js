@@ -1,6 +1,3 @@
-// This script no longer needs to handle declarativeNetRequest.
-// Its only jobs are to manage tab state and update the icon.
-
 const tabStates = {};
 let iconProgressBitmap = null;
 

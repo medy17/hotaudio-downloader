@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // UI Elements
     const downloadBtn = document.getElementById('downloadBtn');
     const btnText = document.getElementById('btnText');
     const statusEl = document.getElementById('status');
@@ -7,10 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
 
-    /**
-     * Updates the entire popup UI based on the current state.
-     * @param {object|null} state - The state object from the background script.
-     */
     function updateUI(state) {
         // Default/Ready State
         if (!state) {
@@ -24,10 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Update status text
         statusEl.textContent = state.message;
 
-        // Check for and display the duration warning
         if (state.duration && state.duration > 600) { // 600 seconds = 10 minutes
             const minutes = Math.floor(state.duration / 60);
             warningEl.textContent = `Warning: This is a long audio file (~${minutes} minutes). The capture process may take some time.`;
@@ -36,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
             warningEl.style.display = 'none';
         }
 
-        // Handle Error State
         if (state.message.includes("Error") || state.message.includes("timed out")) {
             btnText.textContent = 'Error Occurred';
             downloadBtn.className = 'error';
@@ -91,9 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for real-time updates from the background/content script
     chrome.runtime.onMessage.addListener((request, sender) => {
-        // A message indicates that the state *might* have changed.
-        // Instead of using the partial data in `request`, we ask the background
-        // script (the single source of truth) for the complete, up-to-date state.
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             if (tabs[0] && sender.tab && sender.tab.id === tabs[0].id) {
                 fetchAndUpdateState();

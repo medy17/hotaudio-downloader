@@ -15,7 +15,6 @@ SourceBuffer.prototype.appendBuffer = function(data) {
 
 // --- Part 2: Find and wrap the AudioSource class using rapid polling. ---
 
-// We'll check for the class every 10 milliseconds.
 const hijackInterval = setInterval(() => {
     // Check if the site's script has defined the class on the window object.
     if (typeof window.AudioSource === 'function') {
@@ -42,9 +41,8 @@ const hijackInterval = setInterval(() => {
 
         console.log('[Hotaudio Downloader] Hijack complete. Ready for download command.');
     }
-}, 10); // Poll every 10ms
+}, 10);
 
-// Safety net: stop polling after 10 seconds if it's never found.
 setTimeout(() => {
     clearInterval(hijackInterval);
 }, 10000);
