@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hotaudio Downloader</title>
+    <style>
+        body { font-family: sans-serif; width: 250px; text-align: center; padding: 10px; }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+        button:hover { background-color: #e0e0e0; }
+        button:disabled { cursor: not-allowed; background-color: #fafafa; color: #999; }
+        #status { margin-top: 15px; min-height: 20px; font-style: italic; color: #555; }
+    </style>
+</head>
+<body>
+<h3>Hotaudio Downloader</h3>
+<button id="downloadBtn">Download Audio</button>
+<p id="status">Ready to download.</p>
+<script src="popup.js"></script>
+</body>
+</html>
