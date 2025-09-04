@@ -54,5 +54,10 @@ The extension employs a multi-script strategy to reliably capture the audio:
 4.  The process will begin. You can monitor the progress in the popup and on the extension icon itself.
 5.  Once the capture is complete, a standard "Save As" dialog will appear, allowing you to save the `.m4a` audio file to your computer.
 
+## Known Issue
+
+- Moov box within the downloaded files are at the end. I am working on it but for the time being, you could run ffmpeg on the downloaded file as follows:
+`ffmpeg -i broken.m4a -c:a copy -movflags faststart fixed.m4a`. That should get the moov atom back to the start of the file and solve any compatibility issues with media players or metadata editing.
+
 ## P.S: I recommend pinning the extension to your toolbar when you're downloading to see progress for larger files. Unpin when you're done.
 ---
