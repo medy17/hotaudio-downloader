@@ -28,12 +28,10 @@ async function updateIconProgress(tabId, progress) {
 
     const canvas = new OffscreenCanvas(128, 128);
     const ctx = canvas.getContext('2d');
-
     ctx.clearRect(0, 0, 128, 128);
-
     ctx.globalAlpha = 0.4;
     ctx.drawImage(iconProgressBitmap, 0, 0, 128, 128);
-    ctx.globalAlpha = 1.0; // Reset alpha
+    ctx.globalAlpha = 1.0;
 
     if (progress > 0) {
         const center = 64;
@@ -47,9 +45,7 @@ async function updateIconProgress(tabId, progress) {
         ctx.arc(center, center, radius, startAngle, endAngle);
         ctx.closePath();
         ctx.clip();
-
         ctx.drawImage(iconProgressBitmap, 0, 0, 128, 128);
-
         ctx.restore();
     }
 
@@ -61,26 +57,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const tabId = request.tabId || (sender.tab ? sender.tab.id : null);
     if (!tabId) return true;
 
+    if (!tabStates[tabId]) {
+        tabStates[tabId] = {};
+    }
+
     if (request.action === "updateStatus") {
         tabStates[tabId] = { ...tabStates[tabId], ...request };
-
-        if (request.progress !== null && request.progress >= 0) {
+        if (request.progress !== undefined && request.progress >= 0) {
             updateIconProgress(tabId, request.progress);
         }
-
-        if (request.progress === 100 || request.message.includes("Error")) {
+        if (request.progress === 100 || request.message.includes("Error") || request.message.includes("cancelled")) {
             setTimeout(() => {
                 delete tabStates[tabId];
                 resetIcon(tabId);
             }, 5000);
         }
-
     } else if (request.action === "durationInfo") {
-        tabStates[tabId] = { ...tabStates[tabId], duration: request.duration };
-
+        tabStates[tabId].duration = request.duration;
+    } else if (request.action === "playerReady") {
+        tabStates[tabId].isReady = true;
     } else if (request.action === "getTabState") {
         sendResponse(tabStates[tabId]);
     }
 
     return true;
+});
+
+chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+    if (tabStates[tabId]) {
+        console.log(`Tab ${tabId} closed, cleaning up its state.`);
+        delete tabStates[tabId];
+    }
 });
