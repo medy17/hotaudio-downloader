@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
   "name": "Hotaudio Downloader",
-  "version": "1.1",
+  "version": "1.2",
   "description": "Automates downloading of decrypted audio from Hotaudio.",
   "permissions": [
     "scripting",
-    "activeTab"
+    "activeTab",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
     "*://*.hotaudio.net/*"
@@ -20,6 +21,15 @@
   },
   "background": {
     "service_worker": "background.js"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
   },
   "content_scripts": [
     {
@@ -36,7 +46,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "icons/icon_progress.png"
+        "icons/icon_progress.png",
+        "vendor/nozzle.old.js"
       ],
       "matches": ["*://*.hotaudio.net/*"]
     }

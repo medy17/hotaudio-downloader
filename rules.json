@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "extensionPath": "/vendor/nozzle.old.js"
+      }
+    },
+    "condition": {
+      "urlFilter": "hotaudio.net/nozzle.js",
+      "resourceTypes": ["script"]
+    }
+  }
+]
