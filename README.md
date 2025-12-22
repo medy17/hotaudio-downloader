@@ -4,9 +4,11 @@ A Chrome extension for downloading from Hotaudio.net.
 
 INFO: This project has moved to closed source for... obvious reasons. I hope this is understandable else it would be difficult to keep patching it.
 
-## Screenshots
+## Screenshot
 
-![Screenshot](readme-assets/hotaudio-downloader.png)
+![Screenshot](https://raw.githubusercontent.com/medy17/hotaudio-downloader/refs/heads/main/readme-assets/hotaudio_downloader.png)
+
+
 ## Overview
 
 Hotaudio.net uses modern streaming technologies (like MPEG-DASH) where audio is delivered in small, encrypted chunks. This prevents simple "right-click and save" downloading. This extension works by intercepting the decrypted audio data just before it's played by your browser, automating a high-speed playback session to capture all the data, and then stitching it together into a single, downloadable `.m4a` file.
@@ -33,4 +35,3 @@ Since this extension is not on the Chrome Web Store, it must be loaded manually 
 5.  Once the capture is complete, a standard "Save As" dialog will appear, allowing you to save the `.m4a` audio file to your computer.
 
 ## P.S: I recommend pinning the extension to your toolbar when you're downloading to see progress for larger files. Unpin when you're done.
----
