@@ -5,9 +5,9 @@ A Chrome extension for downloading from Hotaudio.net.
 INFO: This project has moved to closed source for... obvious reasons. I hope this is understandable else it would be difficult to keep patching it.
 
 ## Screenshot
-
-![Screenshot](https://raw.githubusercontent.com/medy17/hotaudio-downloader/refs/heads/main/readme-assets/hotaudio_downloader.png)
-
+<div align="center">
+<img src="https://raw.githubusercontent.com/medy17/hotaudio-downloader/refs/heads/main/readme-assets/hotaudio_downloader.png" />
+</div>
 
 ## Overview
 
