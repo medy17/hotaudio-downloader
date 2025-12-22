@@ -1,18 +1,18 @@
 {
   "manifest_version": 3,
   "name": "Hotaudio Downloader",
-  "version": "1.2",
+  "version": "2.0",
   "description": "Automates downloading of decrypted audio from Hotaudio.",
   "permissions": [
     "scripting",
     "activeTab",
-    "declarativeNetRequest"
+    "tabs"
   ],
   "host_permissions": [
     "*://*.hotaudio.net/*"
   ],
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
@@ -20,36 +20,41 @@
     }
   },
   "background": {
-    "service_worker": "background.js"
-  },
-  "declarative_net_request": {
-    "rule_resources": [
-      {
-        "id": "ruleset_1",
-        "enabled": true,
-        "path": "rules.json"
-      }
-    ]
+    "service_worker": "service-worker-loader.js",
+    "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["*://*.hotaudio.net/*"],
-      "js": ["hijack.js"],
+      "js": [
+        "assets/hijack.js-DCGIFx1e.js"
+      ],
+      "matches": [
+        "*://*.hotaudio.net/*"
+      ],
       "run_at": "document_start",
       "world": "MAIN"
     },
     {
-      "matches": ["*://*.hotaudio.net/*"],
-      "js": ["content.js"]
+      "js": [
+        "assets/content.js-C2QMy5vF.js"
+      ],
+      "matches": [
+        "*://*.hotaudio.net/*"
+      ]
     }
   ],
   "web_accessible_resources": [
     {
+      "matches": [
+        "*://*.hotaudio.net/*"
+      ],
       "resources": [
         "icons/icon_progress.png",
-        "vendor/nozzle.old.js"
+        "src/main_world.js",
+        "assets/hijack.js-DCGIFx1e.js",
+        "assets/content.js-C2QMy5vF.js"
       ],
-      "matches": ["*://*.hotaudio.net/*"]
+      "use_dynamic_url": false
     }
   ],
   "icons": {
