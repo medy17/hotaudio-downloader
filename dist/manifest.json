@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Hotaudio Downloader",
-  "version": "2.0",
+  "version": "2.5",
   "description": "Automates downloading of decrypted audio from Hotaudio.",
   "permissions": [
     "scripting",
@@ -26,7 +26,7 @@
   "content_scripts": [
     {
       "js": [
-        "assets/hijack.js-DCGIFx1e.js"
+        "assets/hijack.js-BPjRu2fF.js"
       ],
       "matches": [
         "*://*.hotaudio.net/*"
@@ -36,7 +36,7 @@
     },
     {
       "js": [
-        "assets/content.js-C2QMy5vF.js"
+        "assets/content.js-CztHwVC-.js"
       ],
       "matches": [
         "*://*.hotaudio.net/*"
@@ -51,8 +51,8 @@
       "resources": [
         "icons/icon_progress.png",
         "src/main_world.js",
-        "assets/hijack.js-DCGIFx1e.js",
-        "assets/content.js-C2QMy5vF.js"
+        "assets/hijack.js-BPjRu2fF.js",
+        "assets/content.js-CztHwVC-.js"
       ],
       "use_dynamic_url": false
     }
